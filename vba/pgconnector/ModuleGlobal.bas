@@ -2,9 +2,9 @@ Attribute VB_Name = "ModuleGlobal"
 '/*MAN______________________________________________________________________
 '
 '
-' FICHIER: $RCSfile: ModuleGlobal.bas,v $ $Revision: 1.8 $
+' FICHIER: $RCSfile$ $Revision$
 '
-'  $Author: jma $  $Date: 2016/03/15 13:38:43 $
+'  $Author$  $Date$
 '
 ' DESCRIPTION
 ' xxxxxxxxxxxxx
@@ -21,196 +21,88 @@ Attribute VB_Name = "ModuleGlobal"
 '___________________________________________________________________ENDMAN*/
 Option Explicit
 
-Public Declare Sub mdlElmdscr_getProperties Lib "stdmdlbltin.dll" (ByRef level As Long, ByRef ggNum As Long, ByRef dgnClass As Long, _
-                                   ByRef locked As Long, ByRef newElm As Long, ByRef modified As Long, ByRef viewIndepend As Long, ByRef solidHole As Long, ByVal pElementDescr As Long)
+Public Const PgcVersion = "1.1.2"
 
-Public Const csteCouleurFibreOptique = 66
-Public Const csteCouleurEclairage = 58
-Public Const csteCouleurElectrique = 35
-Public Const csteCouleurCyclo = 58
 
-Public Const csteA4PORTRAIT = "A4 Portrait"
-Public Const csteA3PORTRAIT = "A3 Portrait"
+'
+' Configuration variables :
+' PGC_SEED_FULLNAME: nom complet du prototype utilisé ($(_USTN_SITE)seed/seed-postgis.dgn par défaut)
+'
 
-Public Const csteA4LigneX1 = 0.15464
-Public Const csteA4LigneX2 = 0.16518
-Public Const csteA4LigneX3 = 0.16787
 
-Public Const csteA4LigneY1 = 0.28713
-Public Const csteA4LigneY2 = 0.28447
-Public Const csteA4LigneY3 = 0.28185
-Public Const csteA4LigneY4 = 0.28453
-
-Public Const csteA3LigneX1 = 0.24816
-Public Const csteA3LigneX2 = 0.25525
-Public Const csteA3LigneX3 = 0.25794
-
-Public Const csteA3LigneY1 = 0.41013
-Public Const csteA3LigneY2 = 0.40747
-Public Const csteA3LigneY3 = 0.40485
-Public Const csteA3LigneY4 = 0.40223
-
-Public Const csteTextelegendeHauteur = 0.002
-Public Const csteTextelegendeLargeur = 0.002
-
-Public Const csteTOPOGRAPHIQUE = "TOPOGRAPHIQUE"
-Public Const csteORTHOPHOTOGRAPHIE = "ORTHOPHOTOGRAPHIE"
-Public Const csteCADASTRE = "PLAN CADASTRAL"
-
-Public Const cstePrecisionOrtho = "Précision: 1 pixel = 10 cm"
-Public Const cstePrecision200 = "Echelle de précision 1/200"
-Public Const cstePrecision500 = "Echelle de précision 1/500"
-Public Const cstePrecisionCadastre = "Précision cadastrale"
-
-Public Const csteTypeDemandeAtu = "ATU"
-Public Const csteTypeDemandeDict = "DICT"
-Public Const csteTypeDemandeDt = "DT"
-Public Const csteTypeDemandeDtDict = "DT/DICT"
-
-Public gCleCommune As String ' trigramme commune "all", "arb",.. pour PMA, code INSEE (381, 125 pour les autres)
-
-Public Enum EnumTypeReseau
-    enuTypeReseauInconnu = 0
-    enuTypeReseauFibreOptique = 1 ' vert
-    enuTypeReseauEclairagePublic = 2 ' rouge
-    enuTypeReseauElectrique = 3 ' rouge
-    enuTypeReseauGaz = 4 ' jaune
-    enuTypeReseauHydrocarbure = 5 'jaune
-    enuTypeReseauChimique = 6 ' orange
-    enuTypeReseauEauPotable = 7 'bleu
-    enuTypeReseauAssainissement = 8 ' marron
-    enuTypeReseauEauPluviale = 9 ' marron
-    enuTypeReseauChauffageClim = 10 ' violet
-    enuTypeReseauTelecom = 11 ' vert
-    enuTypeReseauFeuSignalisation = 12 ' blanc (noir)
-    enuTypeReseauMultiples = 13 ' rose
-    enuTypeReseauCyclable = 14
+Public Enum EnumCheckoutMode
+    enuCheckoutModeUnknown = 0
+    enuCheckoutModeImport = 1
+    enuCheckoutModeAttach = 2
 End Enum
 
-Public Const cteClasseReseauInconnue = "inconnue"
-Public Const cteClasseReseauA = "A"
-Public Const cteClasseReseauB = "B"
-Public Const cteClasseReseauC = "C"
+Public Enum EnumPostgisDgnResetLevel
+    enuPostgisDgnResetNone = 0
+    enuPostgisDgnResetLayerOnly = 1
+    enuPostgisDgnResetFullFile = 2
+End Enum
 
-Public Type ReseauTypeEtClasse
-    typeReseau As EnumTypeReseau
-    classeReseau As String
-    couleur As Integer
-End Type
+Public Enum EnumGeomType
+    enuGeomTypeUnknown = 0
+    enuGeomTypePoint = 1
+    enuGeomTypeArea = 2
+    enuGeomTypeLine = 3
+End Enum
 
-Public gLevelEmprise As level
-Public gLevelPlanche As level
-Public gFormatName As String
-Public gEchelle As Long
-Public gNumeroDemande As String
-Public gTypeDemande As String
-Public gRootFilename As String
-Public gCommune As String
-Public gAdresse As String
-Public gDossierDemandes As String
-Public gDossierReponses As String
-Public gIdRepertoireDemandes As Integer
-Public gZoomFactor As Double
-Public gFillColor As Integer
+Public Const PostgisDgnRefLogicalName = "_pgis_layer_"
+Public Const PgDefaultSrid = 32170
 
-Public Sub PmaInit()
+Public Const PgcUserLangFrench = "fr"
+Public Const PgcUserLangDutch = "du"
 
-Dim dummy As String
+Public gPgcInitDone As Boolean
+Public gPgcUserLang As String
 
-' dossier des demandes
-If Application.ActiveWorkspace.IsConfigurationVariableDefined("AZI_DTDICT_DOSSIER_DEMANDES") Then
-    gDossierDemandes = Application.ActiveWorkspace.ConfigurationVariableValue("AZI_DTDICT_DOSSIER_DEMANDES")
-End If
+Public gSqlWhere As String
+Public gSqlWhereFence As String
+Public gSqlWhereUser As String
+Public gSqlQuery As String
+Public gSqlQueryLabels As String
+Public gSqlUpsert As String
 
-' dossier des réponses
-If Application.ActiveWorkspace.IsConfigurationVariableDefined("AZI_DTDICT_DOSSIER_REPONSES") Then
-    gDossierReponses = Application.ActiveWorkspace.ConfigurationVariableValue("AZI_DTDICT_DOSSIER_REPONSES")
-End If
+Public gSchemasArray() As String
+Public gSchemaName As String
+Public gTableName As String
+Public gEntitynum As Integer
+Public gCheckoutMode As EnumCheckoutMode
+Public gPostgisDgnResetLevel As EnumPostgisDgnResetLevel
+Public gLevelName As String
+Public gLevel As Level
+Public gCellname As String
+Public gCellOrientation As Double
+Public gTextOrientation As Double
+Public gTextSize As Double
+Public gTablenames As Collection
 
-Set gLevelEmprise = Nothing
+Public gPgSrid As Long
 
-' niveau emprise travaux
-dummy = "dict-emprise-travaux"
-If Application.ActiveWorkspace.IsConfigurationVariableDefined("AZI_DTDICT_NIVEAU_EMPRISE") Then
-    dummy = Application.ActiveWorkspace.ConfigurationVariableValue("AZI_DTDICT_NIVEAU_EMPRISE")
-End If
-If dummy <> "" Then Set gLevelEmprise = Application.ActiveDesignFile.Levels.Find(dummy)
-If gLevelEmprise Is Nothing Then
-    Call Application.MessageCenter.AddMessage("Le niveau de l'emprise des travaux est indéterminé." _
-    , "Vérifiez que la variable AZI_DTDICT_NIVEAU_EMPRISE est bien définie et que le niveau " _
-    + IIf(dummy <> "", "'" + dummy + "'", "spécifié") _
-    + " est bien disponible dans le fichier dessin." _
-    , msdMessageCenterPriorityError, True)
-    End
-End If
+Public gPgConnexion As azidblib.aziDbConnexion
+Public gPgCnxList As String
+Public gPgConnectionName As String
+Public gPgHost As String
+Public gPgPort As String
+Public gPgDbname As String
+Public gPgUsername As String
+Public gPgPassword As String
 
-Set gLevelPlanche = Nothing
+Public gUseSharedCell As Boolean
 
-' niveau planches
-dummy = "dict-emprise-planche"
-If Application.ActiveWorkspace.IsConfigurationVariableDefined("AZI_DTDICT_NIVEAU_PLANCHE") Then
-    dummy = Application.ActiveWorkspace.ConfigurationVariableValue("AZI_DTDICT_NIVEAU_PLANCHE")
-End If
-If dummy <> "" Then Set gLevelPlanche = Application.ActiveDesignFile.Levels.Find(dummy)
-If gLevelPlanche Is Nothing Then
-    Call Application.MessageCenter.AddMessage("Le niveau de l'emprise des planches est indéterminé." _
-    , "Vérifiez que la variable AZI_DTDICT_NIVEAU_PLANCHE est bien définie et que le niveau " _
-    + IIf(dummy <> "", "'" + dummy + "'", "spécifié") _
-    + " est bien disponible dans le fichier dessin." _
-    , msdMessageCenterPriorityError, True)
-    End
-End If
+' variable de suspension momentanée de la gestion des modifications d'élément (synchro dao->SIG et topologie)
+Public P_fl_no_elem_events_handle As Boolean
+Public P_launchElemChangeTrack As ClassLaunchIChangeHandler
+Public P_elemChangeTrack As ClassIChangeTrack
+' variable de vérification si la fonction de gestion des modifications d'élément s'est bien déroulée
+Public P_fl_elem_events_function_succeeded As Boolean
+Public P_last_deleted_elem As Element
+Public P_last_deleted_elem_id As DLong
+Public P_soft_deleted_and_created_elem_id As DLong
+Public P_fl_deleted_and_created As Boolean
+Public P_last_deleted_and_created_mslink As Long
 
-' facteur de zoom
-If Application.ActiveWorkspace.IsConfigurationVariableDefined("AZI_DTDICT_ZOOM") Then
-    gZoomFactor = Val(Application.ActiveWorkspace.ConfigurationVariableValue("AZI_DTDICT_ZOOM"))
-End If
-If gZoomFactor <= 0.01 Or gZoomFactor > 1000 Then gZoomFactor = 5
 
-' couleur de remplissage de l'emprise
-If Application.ActiveWorkspace.IsConfigurationVariableDefined("AZI_DTDICT_FILL_COLOR") Then
-    gFillColor = Val(Application.ActiveWorkspace.ConfigurationVariableValue("AZI_DTDICT_FILL_COLOR"))
-End If
-If gFillColor <= 0 Or gZoomFactor > 254 Then gFillColor = 4
 
-' format par défaut
-gFormatName = csteA4PORTRAIT
-' échelle par défaut
-gEchelle = 200
-
-End Sub
-Public Function dictCouleur(typeReseau As EnumTypeReseau) As Integer
-
-dictCouleur = 255
-Select Case typeReseau
-    Case enuTypeReseauFibreOptique ' vert
-        dictCouleur = RGB(0, 255, 0)
-    Case enuTypeReseauTelecom  ' vert
-        dictCouleur = RGB(0, 255, 0)
-    Case enuTypeReseauEclairagePublic ' rouge
-        dictCouleur = RGB(255, 0, 0)
-    Case enuTypeReseauElectrique  ' rouge
-        dictCouleur = RGB(255, 0, 0)
-    Case enuTypeReseauGaz  ' jaune
-        dictCouleur = RGB(255, 255, 0)
-    Case enuTypeReseauHydrocarbure  'jaune
-        dictCouleur = RGB(255, 255, 0)
-    Case enuTypeReseauChimique = 6 ' orange
-        dictCouleur = RGB(255, 128, 0)
-    Case enuTypeReseauEauPotable  'bleu
-        dictCouleur = RGB(128, 0, 255)
-    Case enuTypeReseauAssainissement ' marron
-        dictCouleur = RGB(128, 64, 0)
-    Case enuTypeReseauEauPluviale ' marron
-        dictCouleur = RGB(128, 64, 0)
-    Case enuTypeReseauChauffageClim  ' violet
-        dictCouleur = RGB(160, 0, 160)
-    Case enuTypeReseauFeuSignalisation  ' blanc (noir)
-        dictCouleur = 0
-    Case enuTypeReseauMultiples  ' rose
-        dictCouleur = RGB(255, 128, 0)
-    Case enuTypeReseauCyclable
-End Select
-dictCouleur = Application.ActiveModelReference.InternalColorFromRGBColor(dictCouleur)
-
-End Function
