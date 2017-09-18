@@ -1,0 +1,77 @@
+#--------------------------------------------------------------------------------------
+#
+#     $Source$
+#
+#  $Copyright: (c) 2016 Azimut. All rights reserved. $
+#
+#--------------------------------------------------------------------------------------
+#---------------------------------------------
+#    Define constants specific to this example
+#---------------------------------------------
+appName    = pgconnector
+privateInc = $(baseDir)
+language   = english
+langSpec   = $(baseDir)$(language)/
+
+CCompOpts + -IC:/PROGRA~2/MI30EB~1/VC/include
+
+%if !defined (BSI)
+    TkPathGenSrc = $(o)
+    genSrc       = $(o)
+    DLM_NO_SIGN             = 1
+%endif
+
+%include mdl.mki
+
+dirToSearch = $(TkPathGenSrc)
+%include cincapnd.mki
+
+pgconnectorObjs  = $(o)pgconnector$(oext)
+
+pgconnectorRscs  = $(o)pgconnectorcmd.rsc
+
+#----------------------------------------------------------
+# Create needed output directories in case they don't exist
+#----------------------------------------------------------
+always:
+    !~@mkdir $(o)
+    ~@mkdir  $(rscObjects)
+
+$(TkPathGenSrc)pgconnectorcmd.h : $(baseDir)pgconnectorcmd.r
+
+$(o)pgconnector$(oext)          : $(baseDir)pgconnector.cpp $(TkPathGenSrc)pgconnectorcmd.h $(privateInc)pgconnectorid.h
+
+
+DLM_NOENTRY             = 1
+DLM_NO_DLS              = 1
+DLM_NO_DEF              = 1
+DLM_NO_DELAYLOAD        = 1
+DLM_OBJECT_DEST         = $(o)
+DLM_NAME                = $(appName)
+DLM_DEST                = $(mdlapps)
+DLM_OBJECT_FILES        = $(pgconnectorObjs)
+DLM_EXPORT_OBJS         = $(DLM_OBJECT_FILES)
+DLM_LIBRARY_FILES       = $(mdlLibs)toolsubs.lib $(mdlLibs)BentleyDgn.lib
+
+%include dlmlink.mki
+
+
+#---------------------------------------------
+#   Compile MDL Resources
+#---------------------------------------------
+$(o)pgconnectorcmd.rsc          : $(baseDir)pgconnectorcmd.r
+
+$(TkPathReqObj)pgconnector.mi   : $(pgconnectorRscs)
+        $(msg)
+        > $(o)temp.cmd
+        -o$@
+        $(pgconnectorRscs)
+        <
+        $(RLibCmd) @$(o)temp.cmd
+        ~time
+
+#---------------------------------------------
+#   Include language specific build steps
+#---------------------------------------------
+%include $(baseDir)pgconnectorrsc.mki
+

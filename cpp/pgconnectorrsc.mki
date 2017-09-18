@@ -1,0 +1,35 @@
+#--------------------------------------------------------------------------------------
+#
+#    $RCSfile: pgconnectorrsc.mki,v $
+#   $Revision$
+#       $Date$
+#
+#  $Copyright: (c) 2008 Bentley Systems, Incorporated. All rights reserved. $
+#
+#--------------------------------------------------------------------------------------
+appName = pgconnector
+
+maRscs =   \
+    $(TkPathReqObj)pgconnector.mi       \
+    $(rscObjects)pgconnector.rsc        \
+    $(rscObjects)pgconnectormsgs.rsc    \
+
+$(rscObjects)pgconnector.rsc    : $(baseDir)pgconnector.r $(langSpec)pgconnectortext.h $(TkPathGenSrc)pgconnectorcmd.h $(privateInc)pgconnectorid.h
+
+$(rscObjects)pgconnectormsgs.rsc: $(langSpec)pgconnectormsgs.r $(privateInc)pgconnectorid.h
+
+%if defined (BSI)
+    MA_NAME         = $(appName)
+    MA_DEST         = $(mdlapps)
+    MA_RSC_FILES    = $(maRscs)
+    %include malink.mki
+%else
+    $(mdlapps)$(appName).ma : $(maRscs)
+        $(msg)
+        > $(rscObjects)make.opt
+        -o$@
+        $(maRscs)
+        <
+        $(RLibCmd) @$(rscObjects)make.opt
+        ~time
+%endif
