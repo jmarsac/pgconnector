@@ -7,7 +7,7 @@
 +--------------------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------+
 |									|
-|     $Source$
+|    $Logfile$
 |   $Workfile$
 |   $Revision$
 |   	$Date$
@@ -17,24 +17,19 @@
 |									|
 |   Function -								|
 |									|
-|	PGCONNECTOR Example application static dialog box text			|
+|	Dialog Box IDs							|
 |									|
 +----------------------------------------------------------------------*/
-#if !defined (__pgconnectortextH__)
-#define	__pgconnectortextH__
+#if !defined (__pgconnectormsgidH__)
+#define	__pgconnectormsgidH__
 
+#
 /*----------------------------------------------------------------------+
 |									|
-|    Dialog box aspect ratio						|
+|   Messages  Ids							|
 |									|
 +----------------------------------------------------------------------*/
-#define ASPECT_LOCATEPARCEL	1.0	/* locate parcel dialog box */
+#define	TXTID_PGCONNECTOR_commands_loaded	1
 
-/*----------------------------------------------------------------------+
-|									|
-|    Dialog box aspect ratio						|
-|									|
-+----------------------------------------------------------------------*/
-#define	TXT_PGCONNECTOR_commands_loaded				"PGCONNECTOR commands loaded"
 
-#endif /* if !defined (__pgconnectortextH__) */
+#endif /* if !defined (__pgconnectoridH__) */

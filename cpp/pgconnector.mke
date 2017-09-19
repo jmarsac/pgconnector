@@ -39,7 +39,7 @@ always:
 
 $(TkPathGenSrc)pgconnectorcmd.h : $(baseDir)pgconnectorcmd.r
 
-$(o)pgconnector$(oext)          : $(baseDir)pgconnector.cpp $(TkPathGenSrc)pgconnectorcmd.h $(privateInc)pgconnectorid.h
+$(o)pgconnector$(oext)          : $(baseDir)pgconnector.cpp $(TkPathGenSrc)pgconnectorcmd.h $(privateInc)pgconnectorid.h $(privateInc)pgconnectormsgid.h $(langSpec)pgcmsg.r $(langSpec)pgconnectortext.h
 
 
 DLM_NOENTRY             = 1
