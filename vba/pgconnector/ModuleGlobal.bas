@@ -21,7 +21,7 @@ Attribute VB_Name = "ModuleGlobal"
 '___________________________________________________________________ENDMAN*/
 Option Explicit
 
-Public Const PgcVersion = "1.1.2"
+Public Const PgcVersion = "1.1.3"
 
 
 '

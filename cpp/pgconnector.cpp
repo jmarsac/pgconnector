@@ -1020,6 +1020,7 @@ ___________________________________________________________________ENDMAN*/
 Public void pgcDisconnect(char *args)
 //cmdNumber CMD_PGC_DISCONNECT
 {
+mdlInput_sendKeyin("vba run [pgconnector]ModulePgconnector.pgcDisconnect",0, INPUTQ_EOQ, NULL);
 }
 
 /*----------------------------------------------------------------------+

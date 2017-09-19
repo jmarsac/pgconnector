@@ -178,9 +178,9 @@ If CheckConnection = True Then
     SaveSetting "PgConnector", Me.TextBoxCnxName.text, "Host", Me.TextBoxHost.text
     SaveSetting "PgConnector", Me.TextBoxCnxName.text, "Port", Me.TextBoxPort.text
     SaveSetting "PgConnector", Me.TextBoxCnxName.text, "Dbname", Me.TextBoxDbName.text
-    If Me.CheckBoxRecLogin.value = True Then
+    If Me.CheckBoxUsr.value = True Then
         SaveSetting "PgConnector", Me.TextBoxCnxName.text, "Username", Me.TextBoxUsr.text
-        If Me.CheckBoxRecPwd.value = True Then
+        If Me.CheckBoxPwd.value = True Then
             SaveSetting "PgConnector", Me.TextBoxCnxName.text, "Password", gPgPassword
         End If
     End If
@@ -270,8 +270,8 @@ Me.Label6.Caption = l10n(TXT_MODE_SSL)
 Me.Label7.Caption = l10n(TXT_NOM)
 Me.Label8.Caption = l10n(TXT_MOT_DE_PASSE)
 Me.Frame1.Caption = l10n(TXT_IDENTIFICATION)
-Me.CheckBoxRecLogin.Caption = l10n(TXT_ENREGISTRER)
-Me.CheckBoxRecPwd.Caption = l10n(TXT_ENREGISTRER)
+Me.CheckBoxUsr.Caption = l10n(TXT_ENREGISTRER)
+Me.CheckBoxPwd.Caption = l10n(TXT_ENREGISTRER)
 Me.CommandButtonCheckConnection.Caption = l10n(TXT_TESTER_LA_CONNEXION)
 
 Me.CommandButtonOk.Caption = l10n(TXT_OK)
